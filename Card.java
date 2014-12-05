@@ -72,19 +72,19 @@ public class Card
    //Sets the filename for the card image
    public void fileName()
    {
-      cardPic = "card/";
+      //cardPic = "card/";
    
       //Use if/else statement to make string value of rank   
       if (rank == ACE) 
-         {cardPic += "ace";}
+         {cardPic = "ace";}
       else if (rank == JACK)
-         {cardPic += "jack";}
+         {cardPic = "jack";}
       else if (rank == QUEEN)
-         {cardPic += "queen";}
+         {cardPic = "queen";}
       else if (rank == KING)
-         {cardPic += "king";}
+         {cardPic = "king";}
       else
-         {cardPic += (Integer.toString(rank));}
+         {cardPic = (Integer.toString(rank));}
        
       
       //Use if/else statement to make string vlaue of suit

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.lang.ArrayIndexOutOfBoundsException;
 
 public class CardList
 {
@@ -64,12 +65,12 @@ public class CardList
    //@return Card copy of top card
    public Card topCard()
    {
-      try
+      if (!(isEmpty()))
       {
          Card c = cardList.get(0);
          return c;
       }
-      catch (ArrayIndexOutOfBoundsException a)
+      else
       {
          return null;
       }

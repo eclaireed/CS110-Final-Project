@@ -17,11 +17,11 @@ public class Deck extends CardList
    {
       cardList = new ArrayList<Card>();
 
-      for (int r = Card.ACE; r<=Card.KING;r++)
+      for (int s = Card.SPADES;s<=Card.DIAMONDS;s++)
       {
-         for (int s = Card.SPADES;s<=Card.DIAMONDS;s++)
+         for (int r = Card.ACE; r<=Card.KING;r++)
          {
-           cardList.add(new Card(r,s));
+           cardList.add(new Card(s,r));
          }
       } 
    }

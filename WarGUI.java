@@ -1,7 +1,3 @@
-import java.io.File;
-//import java.io.FileNotFoundException;
-import java.io.IOException;
-//import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,10 +6,12 @@ public class WarGUI extends JFrame
 {
    //Declare necessary variables
 	private War game;
-	private JPanel userPanel, compPanel;
+	private JPanel userPanel, compPanel, messagePanel, labelPanel ;
 	private JLabel userHand, compHand, userPile, compPile, gameText;
+   private JLabel playerLabel;
 	private ImageIcon backImage, userCard, playerCard;
 	private JButton playButton;
+   private int userTurnOne = 1, compTurnOne = 1, roundOne = 1;
 	
 	//Constructor
 	public WarGUI()
@@ -25,31 +23,38 @@ public class WarGUI extends JFrame
       //Set up window
 		setTitle("War");
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      setLayout(new FlowLayout());
-      setSize(800,600);
+      setLayout(new BorderLayout());
+      setSize(700,350);
       validate();
       panelSetUp();
       
       //Add player panels
-      add(userPanel);
-      add(compPanel);
+      add(userPanel, BorderLayout.WEST);
+      userPanel.setSize(350,220);
+      add(compPanel, BorderLayout.EAST);
+      userPanel.setSize(350,220);
+      add(labelPanel,BorderLayout.NORTH);
+      add(messagePanel, BorderLayout.SOUTH);
 
       setVisible(true);
 	}
 
 	private void panelSetUp()
 	{  
-		//create a text field to print status messages in can use HTML :)
+		//Create a text fields to print messages
 		gameText = new JLabel("This is War");
-      //create cards
+      String newText = "<html> Computer &emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp User &emsp</html>";
+      playerLabel = new JLabel(newText);
+
+      //Create card pile labels
       userHand = new JLabel();
       compHand = new JLabel();
       userPile = new JLabel();
       compPile = new JLabel();
       update();
       
-		//create play button
-		playButton = new JButton("Play");
+		//Start button
+		playButton = new JButton("Start Game");
       
 		//add listener on the play button
 		playButton.addActionListener(new PlayButtonListener());
@@ -57,42 +62,52 @@ public class WarGUI extends JFrame
 		//Set up panels
       userPanel = new JPanel();
       compPanel = new JPanel();
+      messagePanel = new JPanel();
+      labelPanel = new JPanel();
 
       userPanel.add(userHand);
       userPanel.add(userPile);
       
-      userPanel.add(compHand);
-      userPanel.add(compPile);
+      compPanel.add(compPile);
+      compPanel.add(compHand);
+      
+      labelPanel.add(playerLabel);
 
-		compPanel.add(gameText);
-		compPanel.add(playButton);
+		messagePanel.add(gameText);
+		messagePanel.add(playButton);
 	}
 
-	//button listener
+	//Button listener
 	private class PlayButtonListener implements ActionListener
     {
         // Called when the button is pushed.
         public void actionPerformed(ActionEvent e)
         {
-        	playButton.setText("Continue Game");
-            game.play();
-            update();
-            
-            // If the game is over
-            if (game.getWinner() != 0)
+            if (roundOne == 1)
             {
-            	// Figure out who won
-	            if (game.getWinner() < 0)
-	            {
-	            	javax.swing.JOptionPane.showMessageDialog(null, "User Wins!");
-	            }
-	            else //g.getWinner() > 0
-	            {
-	            	javax.swing.JOptionPane.showMessageDialog(null, "Computer Wins!");
-	            }
-	            // And finish up.
-	            updateText(); // To get the "P1 wins!"/"P2 Wins." message
-	            playButton.setEnabled(false); // Disable the continue button.
+               playButton.setText("Draw");
+               roundOne = 0;
+            }
+            else
+            {
+               game.play();
+               update();
+                          
+               // Figure out who won at finish
+               if (game.getWinner() != 0)
+               {
+   	            if (game.getWinner() > 0)
+   	            {
+   	            	javax.swing.JOptionPane.showMessageDialog(null, "User Wins!");
+   	            }
+   	            else
+   	            {
+   	            	javax.swing.JOptionPane.showMessageDialog(null, "Computer Wins!");
+   	            }
+   	            
+   	            updateText(); // update text to display winner
+   	            playButton.setEnabled(false); //turn off button
+               }
             }
             
 
@@ -103,13 +118,12 @@ public class WarGUI extends JFrame
     {
         updateImages();
         updateText();
-        //updateTotals();
     }
 
 	//call this everytime something happens
 	public void updateImages()
     {
-    	// Set the player's hand to the back of a card if it has cards in it, otherwise set it to nothing.
+    	   // Set the player's hand to the back of a card if it has cards in it, otherwise set it to nothing.
         if (!(game.userHand.isEmpty()))
         {
             userHand.setIcon(backImage);
@@ -118,18 +132,20 @@ public class WarGUI extends JFrame
         {
             userHand.setIcon(null);
         }
-        userHand.revalidate(); // Repaint
+        userHand.revalidate();
         
         // Set the player's top card on the pile to the correct image if there are cards on the pile, otherwise set it to nothing.
-        if (game.userHand.topCard() != null)
+        if (game.userHand.topCard() != null)// && !(userTurnOne == 1))
         {
-            userPile.setIcon(game.userHand.topCard().getImage());
+            userCard = new ImageIcon(game.userHand.topCard().cardPic);
+            userPile.setIcon(userCard);
         }
         else
         {
             userPile.setIcon(null);
+            //userTurnOne = 0;
         }
-        userPile.revalidate(); // Repaint
+        userPile.revalidate();
         
         // Set the computer's hand to the back of a card if it has cards in it, otherwise set it to nothing.
         if (!(game.compHand.isEmpty()))
@@ -143,13 +159,14 @@ public class WarGUI extends JFrame
         compHand.revalidate(); // Repaint
         
         // Set the player's top card on the pile to the correct image if there are cards on the pile, otherwise set it to nothing.
-        if (game.compHand.topCard() != null)
+        if (game.compHand.topCard() != null) // && !(compTurnOne == 1))
         {
             compPile.setIcon(game.compHand.topCard().getImage());
         }
         else
         {
             compPile.setIcon(null);
+            //compTurnOne = 0;
         }
         compPile.revalidate(); // Repaint
     }
@@ -157,9 +174,9 @@ public class WarGUI extends JFrame
 	public void updateText()
     {
     	String newText = "<html>"+game.gameText()
-    			+ "<br>User cards: " + (game.userHand.cardsInList()+game.userPile.cardsInList())
-    			+ "<br>Computer size: " + (game.compHand.cardsInList()+game.compPile.cardsInList())
-    			+ "</html>";
+    		+ "<br>User cards: " + (game.userHand.cardsInList()+game.userPile.cardsInList())
+    		+ "<br>Computer size: " + (game.compHand.cardsInList()+game.compPile.cardsInList())
+    		+ "</html>";
     	
       gameText.setText(newText);
     }

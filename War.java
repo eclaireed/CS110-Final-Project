@@ -5,6 +5,7 @@ public class War
    {
       // Create a new War game and play it
       War warGame = new War();
+      warGame.play();
    }
 
    public Deck deck;
@@ -23,7 +24,8 @@ public class War
    //Constructor that sets up game
    public War()
    {     
-      startGame();  
+      startGame();
+      gameText = "This is War!"; 
    }
    
    //Sets up deck, deals hands
@@ -115,10 +117,33 @@ public class War
    					compPile.addCard(tempCards.useCard(0));
    				}
    				break;
-   			default:
-   				gameText+="War!";
-   				tempCards.addCard(userHand.useCard(0));
-   				tempCards.addCard(compHand.useCard(0));
+   			case NO_WINNER:
+   				gameText="War!";
+               if ((userHand.cardsInList()>1)&&(compHand.cardsInList()>1))
+               {
+   				   tempCards.addCard(userHand.useCard(0));
+   				   tempCards.addCard(compHand.useCard(0));
+               }
+               else if (!(userHand.cardsInList()>1))
+               {
+                  if (userHand.cardsInList()==1)
+                  {
+                     userPile.addCard(compHand.useCard(0));  
+                  }
+                  
+                  gameWinner = COMP;
+               }
+               else
+               {
+                  if (compHand.cardsInList()==1)
+                  {
+                     compPile.addCard(userHand.useCard(0)); 
+                  }
+                  
+                  gameWinner = USER;
+               }
+               break;
+            
    		}
       }
    }
@@ -144,6 +169,7 @@ public class War
          case USER:
             userPile.addCard(userHand.useCard(0));
             userPile.addCard(compHand.useCard(0));
+            break;
          case COMP:
             compPile.addCard(compHand.useCard(0));
             compPile.addCard(userHand.useCard(0));
@@ -160,6 +186,7 @@ public class War
          case USER:   
             winRound(USER);
             winRound(USER);
+            break;
          case COMP:
             winRound(COMP);
             winRound(COMP);
@@ -192,10 +219,13 @@ public class War
       {
          case USER:
 		      gameWinner = USER_WIN;
+            break;
          case COMP:
             gameWinner = COMP_WIN;
+            break;
          default:
             gameWinner = NO_WINNER;
+            
       }
 	}
    
